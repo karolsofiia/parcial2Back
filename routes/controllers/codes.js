@@ -6,13 +6,13 @@ const moment = require('moment-timezone');
 const validateCredentials = async (req, res) => {
     const { code, userId } = req.body; // Se recibe el código y el ID del usuario desde el frontend
     try {
-        // Buscar si el código existe en la base de datos
-        const existingCode = await pool.db('sorteoI').collection('codigos').findOne({ code });
+        // Buscar si el código existe en la DB
+        const existingCode = await pool.db('sorteo').collection('codigos').findOne({ code });
 
         if (existingCode) {
             // Verificar si el código ya ha sido usado por otro usuario
             if (existingCode.status !== 'libre') {
-                return res.status(400).json({ status: "Error", message: "Ups, al parecer este código ya ha sido usado." });
+                return res.status(400).json({ status: "Error", message: " Este código ya ha sido usado." });
             }
 
             // Obtener la fecha y hora actual en formato Bogotá
@@ -20,7 +20,7 @@ const validateCredentials = async (req, res) => {
             const userObjectId = new ObjectId(userId);
 
             // Actualizar el código en la base de datos: cambiar el estado a ocupado y asignar el userId y la fecha
-            await pool.db('sorteoI').collection('codigos').updateOne(
+            await pool.db('sorteo').collection('codigos').updateOne(
                 { code }, // Filtro para encontrar el código
                 { 
                     $set: { 
@@ -37,14 +37,14 @@ const validateCredentials = async (req, res) => {
             if (prizeValue === 0) {
                 message = "No ganaste";
             } else {
-                message = `¡Ganaste  ${prizeValue} en Nequi!`;
+                message = `¡Ganaste  ${prizeValue} !`;
             }
 
             return res.status(200).json({ status: "Success", message, prizeValue });
 
         } else {
             // Si el código no existe
-            return res.status(404).json({ status: "Error", message: "Código no válido o inexistente" });
+            return res.status(404).json({ status: "Error", message: "Código no válido " });
         }
     } catch (error) {
         console.error('Error fetching code:', error);
@@ -57,7 +57,7 @@ const getUserCodes = async (req, res) => {
     
     try {
         const userObjectId = new ObjectId(userId);  // Convertir el userId a ObjectId
-        const codes = await pool.db('sorteoI').collection('codigos').find({ status: userObjectId }).toArray();
+        const codes = await pool.db('sorteo').collection('codigos').find({ status: userObjectId }).toArray();
         
         res.status(200).json({ status: "Success", codes });
     } catch (error) {
@@ -69,7 +69,7 @@ const getUserCodes = async (req, res) => {
 const getWinners = async (req, res) => {
     try {
         // Busca todos los códigos con status que no sea "libre" (o sea, los códigos que han sido reclamados)
-        const winners = await pool.db('sorteoI').collection('codigos').aggregate([
+        const winners = await pool.db('sorteo').collection('codigos').aggregate([
             {
                 $match: { status: { $ne: 'libre' } }  // Buscar códigos ocupados
             },
