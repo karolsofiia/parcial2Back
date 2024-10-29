@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 
 //---------------Validar código promocional---------------------
 const validateCredentials = async (req, res) => {
-    const { code, userId } = req.body; // Se recibe el código y el ID del usuario desde el frontend
+    const { code, userId } = req.body; // Se recibe el código y el ID del usuario desde el frontend sisi
     try {
         // Buscar si el código existe en la DB
         const existingCode = await pool.db('sorteo').collection('codigos').findOne({ code });
