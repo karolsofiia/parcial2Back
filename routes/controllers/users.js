@@ -10,12 +10,12 @@ const validateCredentials = async (req, res) => {
     const hashedPassword = CryptoJS.SHA256(datos.password, process.env.CODE_SECRET_DATA).toString();
     console.log("PASSS: ", hashedPassword);
     try{
-      const login =  await pool.db('sorteo').collection('users').findOne({ email: datos.email, pass: hashedPassword });
+      const login =  await gana_como_loco('sorteo').collection('users').findOne({ email: datos.email, pass: hashedPassword });
       if (login) {
         // Obtener la fecha y hora actual en formato Bogotá
         const currentDateTime = moment().tz('America/Bogota').format('YYYY-MM-DD HH:mm:ss');
         // Almacenar en la colección log_login
-        await pool.db('sorteo').collection('log_login').insertOne({ email: datos.email, role: login.role, date: currentDateTime });
+        await gana_como_loco('sorteo').collection('log_login').insertOne({ email: datos.email, role: login.role, date: currentDateTime });
         res.json({ status: "Bienvenido", user: datos.email, role: login.role, _id: login._id});
       } else {
         res.json({ status: "ErrorCredenciales" });
@@ -32,13 +32,13 @@ const validateCredentials = async (req, res) => {
     const hashedPassword = CryptoJS.SHA256(datos.password, process.env.CODE_SECRET_DATA).toString();
     console.log("Contraseña",hashedPassword);
     try {
-        const userFind = await pool.db('sorteo').collection('users').findOne({ email: datos.email });
+        const userFind = await gana_como_loco('sorteo').collection('users').findOne({ email: datos.email });
         if (userFind) {
             res.status(409).json({ message: `El usuario con el correo: ${datos.email} ya está creado` });
         } else {
-            const newUser = await pool.db('sorteo').collection('users').insertOne({ email: datos.email, pass: hashedPassword, role: datos.role });
+            const newUser = await gana_como_loco('sorteo').collection('users').insertOne({ email: datos.email, pass: hashedPassword, role: datos.role });
             const userId = newUser.insertedId;
-            await pool.db('sorteo').collection('user_info').insertOne({ user_id: userId, nombre: datos.name, celular: datos.phone, fecha_nac: datos.birthdate, cedula: datos.idNumber, ciudad: datos.city });
+            await gana_como_loco('sorteo').collection('user_info').insertOne({ user_id: userId, nombre: datos.name, celular: datos.phone, fecha_nac: datos.birthdate, cedula: datos.idNumber, ciudad: datos.city });
             res.status(201).json({ message: `Usuario creado exitosamente` });
         }
     } catch (error) {
@@ -53,13 +53,13 @@ const validateCredentials = async (req, res) => {
     const hashedPassword = CryptoJS.SHA256(datos.password, process.env.CODE_SECRET_DATA).toString();
     console.log("Contraseña",hashedPassword);
     try {
-        const userFind = await pool.db('sorteo').collection('users').findOne({ email: datos.email });
+        const userFind = await gana_como_loco('sorteo').collection('users').findOne({ email: datos.email });
         if (userFind) {
             res.status(409).json({ message: `El usuario con el correo: ${datos.email} ya está creado` });
         } else {
-            const newUser = await pool.db('sorteo').collection('users').insertOne({ email: datos.email, pass: hashedPassword, role: datos.role });
+            const newUser = await gana_como_loco('sorteo').collection('users').insertOne({ email: datos.email, pass: hashedPassword, role: datos.role });
             const userId = newUser.insertedId;
-            //await pool.db('sorteoI').collection('user_info').insertOne({ user_id: userId, nombre: datos.name, celular: datos.phone, fecha_nac: datos.birthdate, cedula: datos.idNumber, ciudad: datos.city });
+            //await gana_como_loco('sorteoI').collection('user_info').insertOne({ user_id: userId, nombre: datos.name, celular: datos.phone, fecha_nac: datos.birthdate, cedula: datos.idNumber, ciudad: datos.city });
             res.status(201).json({ message: `Usuario creado exitosamente` });
         }
     } catch (error) {
